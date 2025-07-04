@@ -13,7 +13,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
+import java.net.URL;
 
 import java.net.URI;
 import java.net.URLEncoder;
@@ -92,9 +92,9 @@ public class Mercator implements Shop {
 
                 List<Product> products = new ArrayList<>();
 
-//                for (Hit hit: Data.Product) {
-//                    products.add(productFromHit(hit));
-//                }
+                for (com.chthonic.parserservice.web.dto.shops.mercator.Product mercatorProduct: productResponse.products) {
+                    products.add(productFromHit(mercatorProduct));
+                }
 
                 return products;
             });
@@ -104,14 +104,14 @@ public class Mercator implements Shop {
         }
     }
 
-    Product productFromHit(Hit hit) {
+    Product productFromHit(com.chthonic.parserservice.web.dto.shops.mercator.Product mercatorProduct) {
         Product product = new Product();
         product.setShopName(SHOP_NAME);
-        product.setName(hit.masterValues.name);
-        product.setTitle(hit.masterValues.title);
-        product.setPrice(hit.masterValues.price);
-        product.setBrand(hit.masterValues.ecrBrand);
-        product.setImage(hit.masterValues.imageUrl);
+        product.setName(mercatorProduct.getData().getName());
+        product.setTitle(mercatorProduct.getData().getName());
+        product.setPrice(Double.parseDouble(mercatorProduct.getData().getCurrent_price()));
+        product.setBrand(mercatorProduct.getData().getBrand_name());
+        product.setImage(mercatorProduct.getMainImageSrc());
 
         return product;
     }

@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-//@Service
+@Service
 @Slf4j
 public class Spar implements Shop {
     private static final String SHOP_NAME = "Spar";

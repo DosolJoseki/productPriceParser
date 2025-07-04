@@ -1,14 +1,17 @@
 package com.chthonic.parserservice.web.dto.shops.mercator;
 
+import java.net.URL;
+
+@lombok.Data
 public class Product{
-    public Data data;
-    public String itemId;
-    public String className;
-    public String type;
-    public String mainImageSrc;
-    public Data.Meta _meta;
-    public String url;
-    public String short_name;
-    public int total;
-    public int ordNum;
+    private Data data;
+    private String itemId;
+    private String className;
+    private String type;
+    private URL mainImageSrc;
+    private Data.Meta _meta;
+    private String url;
+    private String short_name;
+    private int total;
+    private int ordNum;
 }
