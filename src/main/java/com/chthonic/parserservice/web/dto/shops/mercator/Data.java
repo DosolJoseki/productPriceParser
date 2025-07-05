@@ -13,7 +13,7 @@ public class Data {
     private String unit_quantity;
     private String invoice_unit;
     private String invoice_unit_type;
-    private int average_weight;
+    private double average_weight;
     private Object normal_price;
     private String current_price;
     private String pc30_price;
