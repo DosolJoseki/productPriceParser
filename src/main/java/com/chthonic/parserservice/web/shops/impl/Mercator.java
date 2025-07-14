@@ -1,11 +1,9 @@
 package com.chthonic.parserservice.web.shops.impl;
 
 import com.chthonic.parserservice.web.dto.Product;
-import com.chthonic.parserservice.web.dto.shops.mercator.Data;
 import com.chthonic.parserservice.web.dto.shops.mercator.ProductsDto;
-import com.chthonic.parserservice.web.dto.shops.spar.Hit;
-import com.chthonic.parserservice.web.dto.shops.spar.ProductResponse;
 import com.chthonic.parserservice.web.shops.Shop;
+import com.chthonic.parserservice.web.utils.NameNormalizer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -13,14 +11,15 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import java.net.URL;
 
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -46,26 +45,17 @@ public class Mercator implements Shop {
                 String url = String.format(
                         "%s?limit=%d&offset=%d&filterData%%5Bsearch%%5D=%s&from=%d",
                         baseUrl,
-                        20,
+                        1000,
                         1,
                         URLEncoder.encode(name, StandardCharsets.UTF_8),
-                        20
+                        0
                 );
 
                 URI uri = URI.create(url);
 
-//                URI uri = UriComponentsBuilder.fromUri(PRODUCTS_URL)
-//                        .queryParam("filterData[search]", name)
-//                        .queryParam("offset", 1)
-//                        .queryParam("limit", 20)
-//                        .queryParam("from", 20)
-//                        .build(true)
-//                        .toUri();
-
                 HttpHeaders headers = new HttpHeaders();
                 headers.set("User-Agent", "Mozilla/5.0");
                 headers.set("Accept", "application/json");
-//                headers.set("Origin", "https://www.spar.si");
 
                 HttpEntity<String> entity = new HttpEntity<>(headers);
 
@@ -93,7 +83,10 @@ public class Mercator implements Shop {
                 List<Product> products = new ArrayList<>();
 
                 for (com.chthonic.parserservice.web.dto.shops.mercator.Product mercatorProduct: productResponse.products) {
-                    products.add(productFromHit(mercatorProduct));
+                    Product product = productFromHit(mercatorProduct);
+                    if (products.stream().noneMatch(e -> e.getDenormalizedTitle().equals(product.getDenormalizedTitle()))) {
+                        products.add(product);
+                    }
                 }
 
                 return products;
@@ -112,6 +105,8 @@ public class Mercator implements Shop {
         product.setPrice(Double.parseDouble(mercatorProduct.getData().getCurrent_price()));
         product.setBrand(mercatorProduct.getData().getBrand_name());
         product.setImage(mercatorProduct.getMainImageSrc());
+        product.setAvailable(true);
+        NameNormalizer.updateProductName(product);
 
         return product;
     }

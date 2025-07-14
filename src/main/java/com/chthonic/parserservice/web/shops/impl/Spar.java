@@ -4,6 +4,7 @@ import com.chthonic.parserservice.web.dto.shops.spar.Hit;
 import com.chthonic.parserservice.web.dto.Product;
 import com.chthonic.parserservice.web.dto.shops.spar.ProductResponse;
 import com.chthonic.parserservice.web.shops.Shop;
+import com.chthonic.parserservice.web.utils.NameNormalizer;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,9 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -41,7 +44,7 @@ public class Spar implements Shop {
                 URI uri = UriComponentsBuilder.fromUri(PRODUCTS_URL)
                         .queryParam("query", name)
                         .queryParam("page", 1)
-                        .queryParam("hitsPerPage", 20)
+                        .queryParam("hitsPerPage", 1000)
                         .queryParam("useAns", "false")
                         .queryParam("substringFilter", "title:!product-number")
                         .queryParam("useAsn", "false")
@@ -78,6 +81,10 @@ public class Spar implements Shop {
 
                 List<Product> products = new ArrayList<>();
 
+                //for tests
+//                var sdfsdfsdf =
+//                        productResponse.hits.stream().filter(e->e.masterValues.name != null).filter(e -> e.masterValues.name.equals("SUN KISS MLEKO KIDS ZF50 200ML")).collect(Collectors.toSet());
+
                 for (Hit hit: productResponse.hits) {
                     products.add(productFromHit(hit));
                 }
@@ -98,6 +105,8 @@ public class Spar implements Shop {
         product.setPrice(hit.masterValues.price);
         product.setBrand(hit.masterValues.ecrBrand);
         product.setImage(hit.masterValues.imageUrl);
+        product.setAvailable(Objects.equals(hit.masterValues.stockStatus, "inStock"));
+        NameNormalizer.updateProductName(product);
 
         return product;
     }

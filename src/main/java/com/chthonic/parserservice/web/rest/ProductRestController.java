@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class ProductRestController {
@@ -19,5 +20,10 @@ public class ProductRestController {
     @GetMapping(value = "get-product")
     public List<Product> getProduct(@RequestParam String productName) {
         return productService.getProductsByName(productName);
+    }
+
+    @GetMapping(value = "get-product-grouped-by-name")
+    public Map<String, List<Product>> getProductGroupedByName(@RequestParam String productName) {
+        return productService.getProductsByNameGroupedByName(productName);
     }
 }
